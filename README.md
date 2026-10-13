@@ -1,50 +1,108 @@
-# Welcome to your Expo app 👋
+# React Native Expo Take-Home Project 🚀
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern React Native app built with **Expo SDK & Expo Router**, fetching and displaying live data from the public [DummyJSON Products API](https://dummyjson.com/docs/products).
 
-## Get started
+---
 
-1. Install dependencies
+## 📱 Features
 
+1. **List Screen (`app/(tabs)/index.tsx`)**:
+   - Fetches live product data from `https://dummyjson.com/products`.
+   - Real-time keyword search across products.
+   - Horizontal category filter pills (All, Beauty, Fragrances, Furniture, Groceries, etc.).
+   - Card layout with product image, title, brand, price discount badge, rating, and stock status.
+   - Pull-to-refresh (`RefreshControl`).
+   - Loading state with skeleton placeholders.
+   - Error state with clear "Try Again" retry logic.
+   - **"Test Error" toggle button**: Located in the top header, allowing reviewers to simulate network failures on demand and test the error state & retry flow with one tap.
+
+2. **Detail Screen (`app/item/[id].tsx`)**:
+   - Opens smoothly when tapping any product card.
+   - High-resolution hero image gallery with interactive thumbnail switcher (`expo-image`).
+   - Pricing section with discount percentage and original price calculation.
+   - Product specifications grid (SKU, Warranty, Shipping Information, Return Policy).
+   - Customer reviews section with ratings and reviewer feedback.
+   - Interactive "Add to Cart" button with haptic feedback (`expo-haptics`).
+   - Pull-to-refresh and full error recovery.
+
+3. **Loading, Error & Pull-to-Refresh States**:
+   - Activity indicators and skeleton mockups during data fetching.
+   - Error view with descriptive messages and a "Try Again" button.
+   - Native pull-to-refresh gesture supported on both List and Detail screens.
+
+4. **Architecture & Design**:
+   - Strictly typed with **TypeScript**.
+   - Modular structure: separation of API service (`services/api.ts`), custom hooks (`hooks/use-products.ts`, `hooks/use-product-detail.ts`), and reusable UI components (`components/`).
+   - Full dark and light theme support (`useColorScheme`).
+
+---
+
+## 🛠️ Prerequisites
+
+- **Node.js** (v18 or newer recommended)
+- **npm** or **yarn**
+- **Expo Go** app installed on your physical iOS or Android device, OR:
+  - iOS Simulator (macOS with Xcode)
+  - Android Emulator (Android Studio)
+  - Web browser (Chrome, Edge, Safari, Firefox)
+
+---
+
+## 🚀 How to Run the App
+
+1. **Install dependencies**:
    ```bash
    npm install
    ```
 
-2. Start the app
-
+2. **Start the Expo development server**:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. **Open the app**:
+   - **Physical Device (Fastest)**: Scan the QR code displayed in the terminal using the **Expo Go** app (Android) or **Camera** app (iOS).
+   - **Android Emulator**: Press `a` in the terminal.
+   - **iOS Simulator**: Press `i` in the terminal (macOS only).
+   - **Web Browser**: Press `w` in the terminal to view in your web browser.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 📂 Project Structure
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+├── app/
+│   ├── (tabs)/
+│   │   ├── _layout.tsx         # Bottom tab navigator configuration
+│   │   ├── index.tsx           # (1) Products List Screen
+│   │   └── explore.tsx         # App Overview & Requirements summary
+│   ├── item/
+│   │   └── [id].tsx            # (2) Product Detail Screen (shown on tap)
+│   ├── _layout.tsx             # Root stack navigator & theme provider
+│   └── modal.tsx               # Modal screen
+├── components/
+│   ├── product/
+│   │   ├── category-filter.tsx # Horizontal category selection chips
+│   │   └── product-card.tsx    # List item card with image, price & rating
+│   └── ui/
+│       ├── empty-view.tsx      # Empty state display
+│       ├── error-view.tsx      # (3) Error screen with retry button
+│       ├── loading-indicator.tsx # (3) Loading screen with skeleton
+│       └── search-bar.tsx      # Search input with clear button
+├── hooks/
+│   ├── use-products.ts         # Hook for products fetching, search & filter
+│   ├── use-product-detail.ts   # Hook for product detail fetching
+│   └── use-color-scheme.ts     # Dark/light theme detection
+├── services/
+│   └── api.ts                  # DummyJSON API service client
+└── types/
+    └── product.ts              # TypeScript interfaces for products & reviews
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## 🧪 Testing the Requirements
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- **Pull-to-Refresh**: Drag down from the top of the list or detail screen.
+- **Error State & Retry**: Tap the **"Test Error"** button in the header of the List Screen or the bug icon in the Detail Screen header, then tap **"Try Again"** to verify error handling and recovery.
+- **Detail Screen**: Tap any product card to view full specifications, images, and reviews.

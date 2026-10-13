@@ -1,98 +1,233 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React from 'react';
+import {
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useProducts } from '@/hooks/use-products';
+import { ProductCard } from '@/components/product/product-card';
+import { CategoryFilter } from '@/components/product/category-filter';
+import { SearchBar } from '@/components/ui/search-bar';
+import { LoadingIndicator } from '@/components/ui/loading-indicator';
+import { ErrorView } from '@/components/ui/error-view';
+import { EmptyView } from '@/components/ui/empty-view';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Product } from '@/types/product';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+export default function ProductListScreen() {
+  const router = useRouter();
+  const isDark = useColorScheme() === 'dark';
 
-export default function HomeScreen() {
+  const {
+    products,
+    categories,
+    selectedCategory,
+    setSelectedCategory,
+    searchQuery,
+    setSearchQuery,
+    loading,
+    refreshing,
+    error,
+    simulateError,
+    toggleSimulateError,
+    onRefresh,
+    retry,
+  } = useProducts();
+
+  const handleProductPress = (product: Product) => {
+    router.push({
+      pathname: '/item/[id]',
+      params: { id: product.id.toString(), title: product.title },
+    });
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('all');
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <SafeAreaView
+      edges={['top']}
+      style={[styles.safeArea, isDark && styles.safeAreaDark]}>
+      {/* Top Header Bar */}
+      <View style={styles.header}>
+        <View>
+          <Text style={[styles.appTitle, isDark && styles.appTitleDark]}>
+            Explore Market
+          </Text>
+          <Text style={[styles.appSubtitle, isDark && styles.appSubtitleDark]}>
+            Live products from DummyJSON
+          </Text>
+        </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        {/* Quick Error Simulator Toggle for reviewers/evaluators */}
+        <TouchableOpacity
+          onPress={toggleSimulateError}
+          activeOpacity={0.8}
+          style={[
+            styles.simToggle,
+            isDark && styles.simToggleDark,
+            simulateError && styles.simToggleActive,
+          ]}>
+          <Ionicons
+            name={simulateError ? 'bug' : 'bug-outline'}
+            size={16}
+            color={simulateError ? '#ffffff' : isDark ? '#94a3b8' : '#64748b'}
+          />
+          <Text
+            style={[
+              styles.simToggleText,
+              isDark && styles.simToggleTextDark,
+              simulateError && styles.simToggleTextActive,
+            ]}>
+            {simulateError ? 'Error ON' : 'Test Error'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchWrapper}>
+        <SearchBar
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search 100+ items..."
+        />
+      </View>
+
+      {/* Category Horizontal Chips */}
+      <CategoryFilter
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+      />
+
+      {/* State Renderers */}
+      {loading && !refreshing ? (
+        <LoadingIndicator message="Fetching catalog..." />
+      ) : error && !refreshing ? (
+        <ErrorView
+          error={error}
+          onRetry={retry}
+          isSimulated={simulateError}
+          onResetSimulation={simulateError ? toggleSimulateError : undefined}
+        />
+      ) : (
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <ProductCard product={item} onPress={handleProductPress} />
+          )}
+          contentContainerStyle={[
+            styles.listContent,
+            products.length === 0 && styles.listContentEmpty,
+          ]}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={isDark ? '#60a5fa' : '#2563eb'}
+              colors={['#2563eb', '#3b82f6']}
+            />
+          }
+          ListEmptyComponent={
+            <EmptyView
+              message={
+                searchQuery
+                  ? `No products found matching "${searchQuery}".`
+                  : 'No products available in this category.'
+              }
+              onClear={handleClearFilters}
+            />
+          }
+        />
+      )}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  safeAreaDark: {
+    backgroundColor: '#0f172a',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  appTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#0f172a',
+    letterSpacing: -0.5,
+  },
+  appTitleDark: {
+    color: '#f8fafc',
+  },
+  appSubtitle: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#64748b',
+    marginTop: 2,
+  },
+  appSubtitleDark: {
+    color: '#94a3b8',
+  },
+  simToggle: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    gap: 4,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  simToggleDark: {
+    backgroundColor: '#1e293b',
+    borderColor: '#334155',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  simToggleActive: {
+    backgroundColor: '#ef4444',
+    borderColor: '#dc2626',
+  },
+  simToggleText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#64748b',
+  },
+  simToggleTextDark: {
+    color: '#94a3b8',
+  },
+  simToggleTextActive: {
+    color: '#ffffff',
+  },
+  searchWrapper: {
+    paddingHorizontal: 16,
+    marginTop: 4,
+  },
+  listContent: {
+    paddingTop: 6,
+    paddingBottom: 24,
+  },
+  listContentEmpty: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
 });

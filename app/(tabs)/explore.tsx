@@ -1,112 +1,272 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+export default function AboutScreen() {
+  const isDark = useColorScheme() === 'dark';
 
-export default function TabTwoScreen() {
+  const openApiDocs = () => {
+    Linking.openURL('https://dummyjson.com/docs/products').catch(() => {});
+  };
+
+  const openExpoDocs = () => {
+    Linking.openURL('https://docs.expo.dev/').catch(() => {});
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <SafeAreaView
+      edges={['top']}
+      style={[styles.container, isDark && styles.containerDark]}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={[styles.title, isDark && styles.titleDark]}>About This App</Text>
+          <Text style={[styles.subtitle, isDark && styles.subtitleDark]}>
+            React Native & Expo Take-Home Project
+          </Text>
+        </View>
+
+        {/* Requirements Status */}
+        <View style={[styles.card, isDark && styles.cardDark]}>
+          <Text style={[styles.cardTitle, isDark && styles.cardTitleDark]}>
+            Implemented Requirements
+          </Text>
+
+          <View style={styles.reqItem}>
+            <Ionicons name="checkmark-circle" size={20} color="#16a34a" />
+            <View style={styles.reqTextContainer}>
+              <Text style={[styles.reqHeading, isDark && styles.reqHeadingDark]}>
+                1. Public API List Screen
+              </Text>
+              <Text style={[styles.reqDesc, isDark && styles.reqDescDark]}>
+                Live catalog fetched from DummyJSON Products API. Includes keyword search, category filter pills, price discounts, and ratings.
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.reqItem}>
+            <Ionicons name="checkmark-circle" size={20} color="#16a34a" />
+            <View style={styles.reqTextContainer}>
+              <Text style={[styles.reqHeading, isDark && styles.reqHeadingDark]}>
+                2. Detail Screen on Tap
+              </Text>
+              <Text style={[styles.reqDesc, isDark && styles.reqDescDark]}>
+                Tapping any product card navigates to full detail view with hero image gallery, stock status, specs, ratings, and customer reviews.
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.reqItem}>
+            <Ionicons name="checkmark-circle" size={20} color="#16a34a" />
+            <View style={styles.reqTextContainer}>
+              <Text style={[styles.reqHeading, isDark && styles.reqHeadingDark]}>
+                3. Loading, Error States & Pull-to-Refresh
+              </Text>
+              <Text style={[styles.reqDesc, isDark && styles.reqDescDark]}>
+                {`Both screens implement pull-to-refresh (RefreshControl), activity loading states with skeleton placeholders, and error views with "Try Again" retry logic. Includes a "Test Error" button to simulate network failures on demand.`}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.reqItem}>
+            <Ionicons name="checkmark-circle" size={20} color="#16a34a" />
+            <View style={styles.reqTextContainer}>
+              <Text style={[styles.reqHeading, isDark && styles.reqHeadingDark]}>
+                4. Comprehensive README
+              </Text>
+              <Text style={[styles.reqDesc, isDark && styles.reqDescDark]}>
+                Full instructions on how to run on iOS, Android, and Web, including architecture overview and troubleshooting tips.
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Tech Stack */}
+        <View style={[styles.card, isDark && styles.cardDark]}>
+          <Text style={[styles.cardTitle, isDark && styles.cardTitleDark]}>
+            Tech Stack
+          </Text>
+          <View style={styles.tagGrid}>
+            {[
+              'React Native',
+              'Expo SDK 54 / 57',
+              'Expo Router v4',
+              'TypeScript',
+              'expo-image',
+              'expo-haptics',
+              'DummyJSON API',
+              'Safe Area Context',
+            ].map((tag) => (
+              <View
+                key={tag}
+                style={[styles.tag, isDark && styles.tagDark]}>
+                <Text style={[styles.tagText, isDark && styles.tagTextDark]}>{tag}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* Quick Links */}
+        <View style={[styles.card, isDark && styles.cardDark]}>
+          <Text style={[styles.cardTitle, isDark && styles.cardTitleDark]}>
+            External Resources
+          </Text>
+
+          <TouchableOpacity
+            style={[styles.linkRow, isDark && styles.linkRowDark]}
+            onPress={openApiDocs}>
+            <View style={styles.linkLeft}>
+              <Ionicons name="cloud-outline" size={20} color="#2563eb" />
+              <Text style={[styles.linkText, isDark && styles.linkTextDark]}>
+                DummyJSON API Documentation
+              </Text>
+            </View>
+            <Ionicons name="open-outline" size={16} color="#94a3b8" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.linkRow, isDark && styles.linkRowDark]}
+            onPress={openExpoDocs}>
+            <View style={styles.linkLeft}>
+              <Ionicons name="book-outline" size={20} color="#2563eb" />
+              <Text style={[styles.linkText, isDark && styles.linkTextDark]}>
+                Expo Documentation
+              </Text>
+            </View>
+            <Ionicons name="open-outline" size={16} color="#94a3b8" />
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
   },
-  titleContainer: {
+  containerDark: {
+    backgroundColor: '#0f172a',
+  },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 32,
+    gap: 16,
+  },
+  header: {
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#0f172a',
+  },
+  titleDark: {
+    color: '#f8fafc',
+  },
+  subtitle: {
+    fontSize: 13,
+    color: '#64748b',
+    marginTop: 2,
+  },
+  subtitleDark: {
+    color: '#94a3b8',
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  cardDark: {
+    backgroundColor: '#1e293b',
+    borderColor: '#334155',
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0f172a',
+    marginBottom: 14,
+  },
+  cardTitleDark: {
+    color: '#f8fafc',
+  },
+  reqItem: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginBottom: 14,
+  },
+  reqTextContainer: {
+    flex: 1,
+  },
+  reqHeading: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0f172a',
+  },
+  reqHeadingDark: {
+    color: '#f8fafc',
+  },
+  reqDesc: {
+    fontSize: 12,
+    color: '#64748b',
+    marginTop: 2,
+    lineHeight: 18,
+  },
+  reqDescDark: {
+    color: '#94a3b8',
+  },
+  tagGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
+  },
+  tag: {
+    backgroundColor: '#eff6ff',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  tagDark: {
+    backgroundColor: '#1e3a8a',
+  },
+  tagText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#2563eb',
+  },
+  tagTextDark: {
+    color: '#93c5fd',
+  },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  linkRowDark: {
+    borderBottomColor: '#334155',
+  },
+  linkLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  linkText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#0f172a',
+  },
+  linkTextDark: {
+    color: '#f8fafc',
   },
 });
